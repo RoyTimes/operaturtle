@@ -1,10 +1,11 @@
 library(shiny)
+library(shinythemes)
 
 server <- function(input, output) {
   
 }
 
-ui <- fluidPage(
+ui <- fluidPage( theme = shinytheme("flatly"),
   
   navbarPage("Play Unknown's Battleground",
              tabPanel("Introduction", sidebarLayout (
@@ -31,26 +32,28 @@ ui <- fluidPage(
 				br(), br()
              ),
              tabPanel("Time of Death", sidebarLayout (
-               sidebarPanel(
-               		radioButtons("rb", "Choose one:",
-					               choiceNames = list(
-					                 "Killers",
-					                 "Victims",
-					                 "All"
-					               ),
-					               choiceValues = list(
-					                 "killers", "victims", "all"
-					               )
-					),
-					textOutput("choice.kva"),br(),
-                    hr(style="border: 1px grey solid"),br(),
-					sliderInput("time", "Time:",
-						min = 0, max = 33,
-						value = 5)
-               ), mainPanel(
-                 h3("Place holder")
-               )
-             )),
+	               sidebarPanel(
+	               		radioButtons("rb", "Choose one:",
+						               choiceNames = list(
+						                 "Killers",
+						                 "Victims",
+						                 "All"
+						               ),
+						               choiceValues = list(
+						                 "killers", "victims", "all"
+						               )
+						),
+						textOutput("choice.kva"),br(),
+	                    hr(style="border: 1px grey solid"),br(),
+						sliderInput("time", "Time:",
+							min = 0, max = 33,
+							value = 5)
+	               ), mainPanel(
+	                 h3("Place holder")
+	               )
+	             ), 
+            	 p ("Analysis")
+             ),
              tabPanel("Weapons", sidebarLayout (
                sidebarPanel(
                  h4("Random Random")
