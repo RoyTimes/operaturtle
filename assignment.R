@@ -79,6 +79,7 @@ data.map <- select(data.map,
                    victim_x, victim_y,
                    weapon, type,
                    killer_x, killer_y)
+
 data.map <- mutate(data.map, distance = sqrt(abs((killer_x - victim_x)*(killer_x - victim_x)) +
                                                abs((killer_y - victim_y))*(killer_y - victim_y)))
 
@@ -89,17 +90,32 @@ data.map <- mutate(data.map, distance = sqrt(abs((killer_x - victim_x)*(killer_x
 ##########################################################################
 
 # data.map2 reduces values by:
-# 1. Removing 
+# 1. Removing na values
+# 2. Filtering for coordinates of killer/victim which are at the edge of the map.
 data.map2 <- na.omit(data.map)
 data.map2 <- filter(data.map2, !(victim_x == 1000 & victim_y == 0)) %>% 
   filter(!(killer_x == 1000 & killer_y == 0))
 
+# binning the data into a smaller grid size. 
 data.bins <- data.map2
 data.bins$victim_x = ceiling(data.bins$victim_x/10)
 data.bins$victim_y = ceiling(data.bins$victim_y/10)
 data.bins$killer_x = ceiling(data.bins$killer_x/10)
 data.bins$killer_y = ceiling(data.bins$killer_y/10)
 
+# Weapon/distance relation
+data.wepdist <- select(data.map2, type, distance)
+# Histogram overlaid with kernel density curve
+ggplot(data.wepdist, aes(x=distance)) + 
+  geom_histogram(binwidth=.5,
+                 colour="black", fill="white") +
+  geom_density(alpha=.2, fill="#FF6666") + 
+  geom_vline(aes(xintercept=mean(distance)),   # Ignore NA values for mean
+                                                   color="red", linetype="dashed", size=1) +# Overlay with transparent density plot
+  facet_wrap( ~ type, ncol = 2)
+  
+
+# Counting death/kill location at each bin.
 data.bins.v <- select(data.bins, x = victim_x, y = victim_y) %>% 
   group_by(x, y) %>% 
   summarize(count_v = n())
@@ -109,14 +125,16 @@ data.bins.k <- select(data.bins, x = killer_x, y = killer_y) %>%
 data.bins.diff <- merge(data.bins.k, data.bins.v, by = c("x", "y"), all = TRUE)
 data.bins.diff$count_k[is.na(data.bins.diff$count_k)] <- 0
 data.bins.diff$count_v[is.na(data.bins.diff$count_v)] <- 0
+
+# Calculating points of interest/not.
 data.bins.diff <- mutate(data.bins.diff, kill_pos = count_k - count_v)
-?merge
 data.bins.diff %>% group_by(kill_pos) %>% summarize(count = n())
 
+# Create table where good and bad points shown.
 data.bins.good <- filter(data.bins.diff, kill_pos > 4)
 data.bins.bad <- filter(data.bins.diff, kill_pos < -4)
 
-# plot showing good and bad positions: todo: select particular sets
+# plot showing good and bad positions:
 ggplot() +
   annotation_custom(rasterGrob(img, 
                                        width = unit(1,"npc"), 
@@ -127,10 +145,10 @@ ggplot() +
   ylab("Y coordinate") +
   geom_point(data = data.bins.bad, aes(x = x, y = y, color = "red", size = -kill_pos)) +
   expand_limits(x = 0, y = 0)
-?rasterGrob
-print(c)
-?seq
-print(c)# Heat map of victim/killer's death position is indicated by a point, and color indicates time of death.
+
+
+
+# Heat map of victim/killer's death position is indicated by a point, and color indicates time of death.
 
 gganimate(ggplot(data.map2) +
             annotation_custom(rasterGrob(img, 
@@ -174,21 +192,6 @@ ggplot(data.map2) +
 
 
 
-
-gganimate(ggplot(data.map2, aes(x = X, y = Y, frame = Time, color = Weapon, cumulative = TRUE)) +
-            annotation_custom(rasterGrob(img, 
-                                         width = unit(1,"npc"), 
-                                         height = unit(1,"npc")), 
-                              -Inf, Inf, -Inf, Inf) +
-            geom_point(aes(frame = Time)) + 
-            theme(legend.position="none"), interval = 0.2, "weapon_heat.gif")
-gg_anim
-heatmap
-library(gapminder)
-p <- ggplot(gapminder, aes(gdpPercap, lifeExp, size = pop, color = continent, frame = year)) +
-  geom_point() +
-  scale_x_log10()
-gganimate(p, interval = 0.1)
 
 
 #
