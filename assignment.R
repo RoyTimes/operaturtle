@@ -11,6 +11,7 @@ library(magick)
 library(grid)
 #setwd("~/INFO 201/FINAL/operaturtle")
 data.in <- read.csv("data/f_miramar.csv")
+data.in <- filter(data.in, map_id == "MIRAMAR")
 
 img <- readJPEG("data/miramar.jpg")
 
@@ -28,23 +29,23 @@ data.players <- data.frame("Player" = paste0("Player: ", c(0:99)))
 data.victim.x <- select(data.in, contains("x")) %>% 
   select(contains("victim")) %>% 
   gather(Player, victim_x, deaths_0_victim_position_x:deaths_9_victim_position_x) %>% 
-  mutate(victim_x = 100 - victim_x / 800000 * 100)
-
+  mutate(victim_x = round(1000 - victim_x / 800000 * 1000))
+?round
 data.victim.y <- select(data.in, contains("y")) %>% 
   select(contains("victim")) %>% 
   gather(Player, victim_y, deaths_0_victim_position_y:deaths_9_victim_position_y) %>% 
-  mutate(victim_y = victim_y / 800000 * 100)
+  mutate(victim_y = round(victim_y / 800000 * 1000))
 
 # Storing Killer position Data.
 data.killer.x <-  select(data.in, contains("x")) %>% 
   select(contains("killer")) %>% 
   gather(Player, killer_x, deaths_0_killer_position_x:deaths_9_killer_position_x) %>% 
-  mutate(killer_x = 100 - killer_x / 800000 * 100)
+  mutate(killer_x = round(1000 - killer_x / 800000 * 1000))
 
 data.killer.y <- select(data.in, contains("y")) %>% 
   select(contains("killer")) %>% 
   gather(Player, killer_y, deaths_0_killer_position_y:deaths_9_killer_position_y) %>% 
-  mutate(killer_y = killer_y / 800000 * 100)
+  mutate(killer_y = round(killer_y / 800000 * 1000))
 
 # Storing Time Data in seconds
 data.time <- select(data.in, contains("time")) %>% 
@@ -55,6 +56,20 @@ data.time <- select(data.in, contains("time")) %>%
 data.weapon <- select(data.in, contains("description")) %>% 
   gather(Player, weapon, deaths_0_description:deaths_9_description)
 
+data.weapon$type[data.weapon$weapon %in% c('AWM','M24','Kar98k','Win94','Mk14','SLR','SKS','Mini14','VSS')] <- "Sniper & DMR"
+data.weapon$type[data.weapon$weapon %in% c('Groza','AKM','DP-28','M249','AUG','M16A4','M416','SCAR-L')] <- "AR & LMG"
+data.weapon$type[data.weapon$weapon %in% c('TommyGun','UMP9','Vector','UZI', 'MicroUZI')] <- "SMG"
+data.weapon$type[data.weapon$weapon %in% c('S686','S1897','S12K')] <- "Shotgun"
+data.weapon$type[data.weapon$weapon %in% c('Sawed-off','R1895','R45','P1911','P92','P18C')] <- "Pistol"
+data.weapon$type[data.weapon$weapon %in% c('Crossbow','Pan','Machete','Crowbar','Sickle','Superman Punch','Punch')] <- "Melee / Other"
+data.weapon$type[data.weapon$weapon %in% c('PickupTruck','Buggy','HitbyCar','Motorbike','Boat','Motorbike(SideCar)','Dacia','death.BP_PickupTruck_B_01_C','death.BP_Van_A_03_C','Uaz')] <- "Vehicle"
+data.weapon$type[data.weapon$weapon %in% c('death.ProjMolotov_DamageField_C','Grenade','death.Buff_FireDOT_C','death.ProjMolotov_C')] <- "Area Damage"
+data.weapon$type[data.weapon$weapon %in% c('DownandOut','Drown','RedZone','death.RedZoneBomb_C','Bluezone','Falling')] <- "Environmnent"
+
+
+####
+
+
 # Combine everything into one data frame.
 data.map <- data.frame(data.victim.x, data.victim.y, data.killer.x, data.killer.y, data.time, data.weapon)
 
@@ -62,51 +77,60 @@ data.map <- data.frame(data.victim.x, data.victim.y, data.killer.x, data.killer.
 data.map <- select(data.map,
                    time,
                    victim_x, victim_y,
-                   weapon,
+                   weapon, type,
                    killer_x, killer_y)
+data.map <- mutate(data.map, distance = sqrt(abs((killer_x - victim_x)*(killer_x - victim_x)) +
+                                               abs((killer_y - victim_y))*(killer_y - victim_y)))
 
-# Finding unique death types.
-weapon.types <- unique(data.map$weapon)
 
-##########################################################################
-### Sepereating Weapon Table
-##########################################################################
-
-data.weapon.sniper <- filter(data.weapon, grepl('AWM|M24|Kar98k|Win94|MK14|SLR|SKS|Mini 14|VSS', Weapon)) %>% 
-  mutate(Type = "Sniper & DMR")
-
-data.weapon.rifle <- filter(data.weapon, grepl('Groza|AKM|DP-28|M249|AUG|M16A4|M416|Scar-L', Weapon)) %>% 
-  mutate(Type = "AR & LMG")
-
-data.weapon.smg <- filter(data.weapon, grepl('Tommy Gun|UMP|Vector|UZI', Weapon)) %>% 
-  mutate(Type = "SMG")
-
-data.weapon.shotgun <- filter(data.weapon, grepl('S686|S1897|S12k', Weapon)) %>% 
-  mutate(Type = "Shotgun")
-
-data.weapon.pistol <- filter(data.weapon, grepl('Sawed-off|R1895|R45|P1911|P92|P18C', Weapon)) %>% 
-  mutate(Type = "Pistol")
-
-data.weapon.melee <- filter(data.weapon, grepl('Crossbow|Pan|Machete|Crowbar|Sickle|Superman Punch|Punch', Weapon)) %>% 
-  mutate(Type = "Melee / Other")
-
-data.weapon.vehicle <- filter(data.weapon, grepl('PickupTruck|Buggy|HitbyCar|Motorbike|Boat|Motorbike(SideCar)|Dacia|death.BP_PickupTruck_B_01_C|death.BP_Van_A_03_C|Uaz', Weapon)) %>% 
-  mutate(Type = "Vehicle")
-
-data.weapon.areadamage <- filter(data.weapon, grepl('death.ProjMolotov_DamageField_C|Grenade|death.Buff_FireDOT_C|"death.ProjMolotov_C', Weapon)) %>% 
-  mutate(Type = "Area Damage")
-
-data.weapon.environment <- filter(data.weapon, grepl('DownandOut|Drown|RedZone|death.RedZoneBomb_C|Bluezone|Falling', Weapon)) %>% 
-  mutate(Type = "environment")
 
 ##########################################################################
 ### Graphing Plots and Maps
 ##########################################################################
 
+# data.map2 reduces values by:
+# 1. Removing 
 data.map2 <- na.omit(data.map)
+data.map2 <- filter(data.map2, !(victim_x == 1000 & victim_y == 0)) %>% 
+  filter(!(killer_x == 1000 & killer_y == 0))
 
+data.bins <- data.map2
+data.bins$victim_x = ceiling(data.bins$victim_x/10)
+data.bins$victim_y = ceiling(data.bins$victim_y/10)
+data.bins$killer_x = ceiling(data.bins$killer_x/10)
+data.bins$killer_y = ceiling(data.bins$killer_y/10)
 
-# Heat map of victim/killer's death position is indicated by a point, and color indicates time of death.
+data.bins.v <- select(data.bins, x = victim_x, y = victim_y) %>% 
+  group_by(x, y) %>% 
+  summarize(count_v = n())
+data.bins.k <- select(data.bins, x = killer_x, y = killer_y) %>% 
+  group_by(x, y) %>% 
+  summarize(count_k = n())
+data.bins.diff <- merge(data.bins.k, data.bins.v, by = c("x", "y"), all = TRUE)
+data.bins.diff$count_k[is.na(data.bins.diff$count_k)] <- 0
+data.bins.diff$count_v[is.na(data.bins.diff$count_v)] <- 0
+data.bins.diff <- mutate(data.bins.diff, kill_pos = count_k - count_v)
+?merge
+data.bins.diff %>% group_by(kill_pos) %>% summarize(count = n())
+
+data.bins.good <- filter(data.bins.diff, kill_pos > 4)
+data.bins.bad <- filter(data.bins.diff, kill_pos < -4)
+
+# plot showing good and bad positions: todo: select particular sets
+ggplot() +
+  annotation_custom(rasterGrob(img, 
+                                       width = unit(1,"npc"), 
+                                       height = unit(1,"npc")), 
+                            -Inf, Inf, -Inf, Inf) +
+  geom_point(data = data.bins.good, aes(x = x, y = y, color = "blue", size = kill_pos)) +
+  xlab("X coordinate") +
+  ylab("Y coordinate") +
+  geom_point(data = data.bins.bad, aes(x = x, y = y, color = "red", size = -kill_pos)) +
+  expand_limits(x = 0, y = 0)
+?rasterGrob
+print(c)
+?seq
+print(c)# Heat map of victim/killer's death position is indicated by a point, and color indicates time of death.
 
 gganimate(ggplot(data.map2) +
             annotation_custom(rasterGrob(img, 
@@ -133,13 +157,13 @@ gganimate(ggplot(data.map2) +
 # Heat map indicating killer vs victim position, looking for anomalies.
 
 gganimate(ggplot(data.map2) +
-                              geom_point(aes(x = killer_x, y = killer_y, frame = time, color = "blue", alpha = 0.000001, cumulative = TRUE)) +
-                              geom_point(aes(x = victim_x, y = victim_y, frame = time, color = "black", alpha = 0.000001, cumulative = TRUE)) +
+                              geom_point(aes(x = killer_x, y = killer_y, frame = time, color = "blue", alpha = 0.001, cumulative = TRUE)) +
+                              geom_point(aes(x = victim_x, y = victim_y, frame = time, color = "black", alpha = 0.001, cumulative = TRUE)) +
                               theme_void() +
                               theme(plot.background = element_rect(fill = "black")),
-                            "event_diff.mp4")
+                            "event_diff.gif")
 
-
+ggplot(data.map2) +
 
 
 
