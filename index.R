@@ -4,22 +4,23 @@ library(ggplot2)
 library(jpeg)
 library(data.table)
 library(devtools)
-#devtools::install_github("dgrtwo/gganimate")
-library("gganimate")
-#install.packages("magick")
+library(gganimate)
 library(magick)
 library(grid)
-#setwd("~/INFO 201/FINAL/operaturtle")
-data.in <- read.csv("data/f_miramar.csv")
-data.in <- filter(data.in, map_id == "MIRAMAR")
 
-img <- readJPEG("data/miramar.jpg")
+#devtools::install_github("dgrtwo/gganimate")
+#install.packages("magick")
+
+data.in <- read.csv("data/f_miramar.csv") %>% 
+  filter(data.in, map_id == "MIRAMAR")
+
+img <- readJPEG("media/JPEG/miramar.jpg")
 
 ##########################################################################
 ### Filtering Dataset
 ##########################################################################
 
-#Extracting Invidiual Values into Tables   mutate(X = X / max(X, na.rm=TRUE)) %>% 
+#Extracting Invidiual Values into Tables
 
 data.players <- data.frame("Player" = paste0("Player: ", c(0:99)))
 
@@ -65,9 +66,6 @@ data.weapon$type[data.weapon$weapon %in% c('Crossbow','Pan','Machete','Crowbar',
 data.weapon$type[data.weapon$weapon %in% c('PickupTruck','Buggy','HitbyCar','Motorbike','Boat','Motorbike(SideCar)','Dacia','death.BP_PickupTruck_B_01_C','death.BP_Van_A_03_C','Uaz')] <- "Vehicle"
 data.weapon$type[data.weapon$weapon %in% c('death.ProjMolotov_DamageField_C','Grenade','death.Buff_FireDOT_C','death.ProjMolotov_C')] <- "Area Damage"
 data.weapon$type[data.weapon$weapon %in% c('DownandOut','Drown','RedZone','death.RedZoneBomb_C','Bluezone','Falling')] <- "Environmnent"
-
-
-####
 
 
 # Combine everything into one data frame.
@@ -187,20 +185,6 @@ gganimate(ggplot(data.map2) +
             scale_y_continuous(expand = c(0, 0), limits = c(0, 1000)) +
             scale_x_continuous(expand = c(0, 0), limits = c(0, 1000)),
                             "event_diff.gif")
-
-
-
-
-
-
-
-
-
-
-
-
-
-#
 
 annotation_custom(rasterGrob(img, 
                              width = unit(1,"npc"), 
