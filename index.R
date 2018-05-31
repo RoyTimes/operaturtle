@@ -5,7 +5,7 @@ library(ggmap)
 library(jpeg)
 library(data.table)
 
-data.in <- read.csv("data/hundred.csv")
+data.in <- read.csv("data/output.csv")
 
 img <- readJPEG("data/erangel.jpg")
 
