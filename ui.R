@@ -11,24 +11,17 @@ my_ui <- fluidPage( style="padding: 0px;",  theme = shinytheme("flatly"),
 					hr(style="border-color: #EEEEEE -moz-use-text-color #FFFFFF; border-style: solid none; border-width: 1px 0; margin: 18px 0;"),
 
 					h4('Dataset Source:'),
-					a("Download Link - Kaggle", href=""),
-					
-					hr(style="border-color: #EEEEEE -moz-use-text-color #FFFFFF; border-style: solid none; border-width: 1px 0; margin: 18px 0;"),
-					
-					h4("Questions to Answer:"),
-					p("<b>Question One:</b> Where do people die most in the game? How many deaths are caused by the limiting of the playing field as opposed to deaths by other players?")
-					
+					a("Download Link - Kaggle", href="")					
 				), mainPanel(
 					br(),
 					img(src='https://i.redd.it/djzln9jnhrez.jpg', height='50%', width='50%')
 				)
 			), 
 			br(),br(),
-			h4("Questions We Proposed"),
+			h4("Navigation Guide"),
 			tags$ol(
-				tags$li(HTML("<b>Question One:</b> Where do people die most in the game? How many deaths are caused by the limiting of the playing field as opposed to deaths by other players?"), tags$ul(tags$li(HTML("An insight we’d like to get is based on your skills as a player, would you die more around these hotspots. ")))),
-				tags$li(HTML("<b>Question Two:</b> Is it wise for people to pick up the supply airdrop? "), tags$ul(tags$li(HTML("One strategy involved in playing the game is camping around valuable drops to lure unsuspecting players into such a zone to gain a positional advantage. ")))),
-				tags$li(HTML("<b>Question Three:</b>  what categories can players be divided into based on statistics such as damage done, kills, distance walked, etc. "), tags$ul(tags$li(HTML("For example, campers might walk less distance and have more damage, etc. Does adopting a particular strategy give a player a higher chance of winning? "))))
+				tags$li(HTML("<b>Tab: Time Of Death</b> In this section, you will be able to see the heatmap of death on the map. There will be three options avaliable: killers' heatmap, victims' heatmap and a heatmap for all.")),
+				tags$li(HTML("<b>Tab: Cause of Death</b> In this section, you will be able to see the heatmap of death filtered by all kinds of causes"))
 			),
 			br(), br()
 		),
@@ -46,7 +39,8 @@ my_ui <- fluidPage( style="padding: 0px;",  theme = shinytheme("flatly"),
 					)
 				), uiOutput("plot1")
 			), br(),
-			p("Analysis", style="margin: 10px")
+			h3("Analysis", style="margin: 10px"),
+			p("As you can see from the graph above, in the first few minuts, people's death spot is approximately the airdrop spot they picked. Later on, the death spots spread the the rest of the territory because people were moving according to the changing blue circle.", style="margin: 10px")
 		),
 		tabPanel("Cause of Death", sidebarLayout (
 				sidebarPanel(
