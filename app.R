@@ -91,21 +91,21 @@ server <- function(input, output) {
     
     if (type() == "victims") {
       mainPanel(
-        tags$video(src="MP4/victim_heatmap.mp4", loop=T, autoplay=T, 
+        tags$video(src="media/MP4/victim_heatmap.mp4", loop=T, autoplay=T, 
                    type="video/mp4", width="480px", height="480px", controls = "controls")		
       )
     }
     else if (type() == "killers") {
       mainPanel(
-        tags$video(src="MP4/killer_heatmap.mp4", loop=T, autoplay=T, 
+        tags$video(src="media/MP4/killer_heatmap.mp4", loop=T, autoplay=T, 
                    type="video/mp4", width="480px", height="480px", controls = "controls")	
       )
     }
     else if (type() == "all") {
       mainPanel(
-        tags$video(src="MP4/victim_heatmap.mp4", loop=T, autoplay=T, 
+        tags$video(src="media/MP4/victim_heatmap.mp4", loop=T, autoplay=T, 
                    type="video/mp4", width="480px", height="480px", controls = "controls")	,
-        tags$video(src="MP4/killer_heatmap.mp4", loop=T, autoplay=T, 
+        tags$video(src="media/MP4/killer_heatmap.mp4", loop=T, autoplay=T, 
                    type="video/mp4", width="480px", height="480px", controls = "controls")		
       )
     }
@@ -115,21 +115,21 @@ server <- function(input, output) {
     
     if (weapon() == "victims") {
       mainPanel(
-        tags$video(src="MP4/victim_heatmap.mp4", loop=T, autoplay=T, 
+        tags$video(src="media/MP4/victim_heatmap.mp4", loop=T, autoplay=T, 
                    type="video/mp4", width="480px", height="480px", controls = "controls")		
       )
     }
     else if (weapon() == "killers") {
       mainPanel(
-        tags$video(src="MP4/killer_heatmap.mp4", loop=T, autoplay=T, 
+        tags$video(src="media/MP4/killer_heatmap.mp4", loop=T, autoplay=T, 
                    type="video/mp4", width="480px", height="480px", controls = "controls")	
       )
     }
     else if (weapon() == "all") {
       mainPanel(
-        tags$video(src="MP4/victim_heatmap.mp4", loop=T, autoplay=T, 
+        tags$video(src="media/MP4/victim_heatmap.mp4", loop=T, autoplay=T, 
                    type="video/mp4", width="480px", height="480px", controls = "controls")	,
-        tags$video(src="MP4/killer_heatmap.mp4", loop=T, autoplay=T, 
+        tags$video(src="media/MP4/killer_heatmap.mp4", loop=T, autoplay=T, 
                    type="video/mp4", width="480px", height="480px", controls = "controls")		
       )
     }
