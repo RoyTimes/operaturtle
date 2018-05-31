@@ -5,7 +5,7 @@ library(ggmap)
 library(jpeg)
 library(data.table)
 
-data.in <- read.csv("data/out.csv")
+data.in <- read.csv("data/hundred.csv")
 
 img <- readJPEG("data/erangel.jpg")
 
@@ -52,7 +52,7 @@ data.weapon.shotgun <- filter(data.weapon, grepl('S686|S1897|S12k', Weapon)) %>%
   mutate(Type = "Shotgun")
 
 data.weapon.pistol <- filter(data.weapon, grepl('Sawed-off|R1895|R45|P1911|P92|P18C', Weapon)) %>% 
-  mutate(Type = "Shotgun")
+  mutate(Type = "Pistol")
   
 data.weapon.melee <- filter(data.weapon, grepl('Crossbow|Pan|Machete|Crowbar|Sickle|Superman Punch|Punch', Weapon)) %>% 
   mutate(Type = "Melee / Other")
