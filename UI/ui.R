@@ -56,31 +56,28 @@ ui <- fluidPage( theme = shinytheme("flatly"),
              tabPanel("Weapons", sidebarLayout (
                sidebarPanel(
                  radioButtons("weapon", "Choose one:",
-						               choiceNames = list(
-						                 "Sniper & DMR",
-										"AR & LMG",
-										"SMG",
-										"Shotgun",
-										"Pistol",
-										"Melee / Other",
-										"Vehicle",
-										"Area Damage",
-										"Environment",
-						               ),
-						               choiceValues = list(
-						                "Sniper & DMR",
-											"AR & LMG",
-											"SMG",
-											"Shotgun",
-											"Pistol",
-											"Melee / Other",
-											"Vehicle",
-											"Area Damage",
-											"Environment"
-
-
-						               )
-						),
+	               choiceNames = list(
+	                 "Sniper & DMR",
+					"AR & LMG",
+					"SMG",
+					"Shotgun",
+					"Pistol",
+					"Melee / Other",
+					"Vehicle",
+					"Area Damage",
+					"Environment"
+	               ),
+	               choiceValues = list(
+	                	"Sniper & DMR",
+						"AR & LMG",
+						"SMG",
+						"Shotgun",
+						"Pistol",
+						"Melee / Other",
+						"Vehicle",
+						"Area Damage",
+						"Environment"
+	               ))
                ), mainPanel(
                  h3("aaa")
                )
