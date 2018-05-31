@@ -7,12 +7,13 @@ library(devtools)
 library(gganimate)
 library(magick)
 library(grid)
+library(plotly)
 
 #devtools::install_github("dgrtwo/gganimate")
 #install.packages("magick")
 
-data.in <- read.csv("data/f_miramar.csv") %>% 
-  filter(data.in, map_id == "MIRAMAR")
+data.in <- read.csv("data/f_miramar.csv")
+data.in <- filter(data.in, map_id == "MIRAMAR")
 
 img <- readJPEG("media/JPEG/miramar.jpg")
 
@@ -22,8 +23,6 @@ img <- readJPEG("media/JPEG/miramar.jpg")
 
 #Extracting Invidiual Values into Tables
 
-data.players <- data.frame("Player" = paste0("Player: ", c(0:99)))
-
 ## Storing Victim Position Data.
 
 # The x coordinates are flipped in the data set thus we flip them around.
@@ -31,7 +30,7 @@ data.victim.x <- select(data.in, contains("x")) %>%
   select(contains("victim")) %>% 
   gather(Player, victim_x, deaths_0_victim_position_x:deaths_9_victim_position_x) %>% 
   mutate(victim_x = round(1000 - victim_x / 800000 * 1000))
-?round
+
 data.victim.y <- select(data.in, contains("y")) %>% 
   select(contains("victim")) %>% 
   gather(Player, victim_y, deaths_0_victim_position_y:deaths_9_victim_position_y) %>% 
@@ -133,7 +132,7 @@ data.bins.good <- filter(data.bins.diff, kill_pos > 2)
 data.bins.bad <- filter(data.bins.diff, kill_pos < -2)
 
 # plot showing good and bad positions:
-ggplot() +
+kill.positive <- ggplot() +
   annotation_custom(rasterGrob(img, 
                                        width = unit(1,"npc"), 
                                        height = unit(1,"npc")), 
@@ -144,7 +143,6 @@ ggplot() +
   geom_point(data = data.bins.bad, aes(x = x, y = y, color = "red", size = -kill_pos)) +
   scale_y_continuous(expand = c(0, 0), limits = c(0, 100)) + 
   scale_x_continuous(expand = c(0, 0), limits = c(0, 100))
-
 
 
 # Heat map of victim/killer's death position is indicated by a point, and color indicates time of death.
