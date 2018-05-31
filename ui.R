@@ -50,36 +50,31 @@ my_ui <- fluidPage( style="padding: 0px;",  theme = shinytheme("flatly"),
                             ),
                             tabPanel("Cause of Death", sidebarLayout (
                               sidebarPanel(
-                                radioButtons("weapon", "Choose one:",
-                                             choiceNames = list(
-                                               "Sniper & DMR",
-                                               "AR & LMG",
-                                               "SMG",
-                                               "Shotgun",
-                                               "Pistol",
-                                               "Melee / Other",
-                                               "Vehicle",
-                                               "Area Damage",
-                                               "Environment"
-                                             ),
-                                             choiceValues = list(
-                                               "Sniper & DMR",
-                                               "AR & LMG",
-                                               "SMG",
-                                               "Shotgun",
-                                               "Pistol",
-                                               "Melee / Other",
-                                               "Vehicle",
-                                               "Area Damage",
-                                               "Environment"
-                                             )
-                                )
+                                p(" This plot displays the number of kills per death type (there are more than 20 weapons). 
+                                  After grouping them into specific subsets, such as vehicles, or bombs (Area Damage), we can see that in the short range, SMG's, AR weapons and shotguns have the most amount of kills. 
+                                  In contrast, Snipers and environment damage is more evenly distributed, which means that they function better on greater distances.")
                               ), mainPanel(
-                                uiOutput("plot2")
+                                plotOutput("plotweapon")
                               )
                             )
-                            )
+                            
+                            
+                 ),
+                 tabPanel("Best Locations",
+                           sidebarLayout(
+                             sidebarPanel(
+                               p("This representation shows which locations have more kills than deaths (blue) 
+                                            or vice versa (red). The size of the dot indicates how much the difference in
+                                            kills/deaths and that position is. This plot makes sense, because all the hotspots
+                                            are around the high population region on the map. We can infer that specific locations,
+                                            such as those with shelter, or high altitude are more likely to give the player there are advantage.")
+                             ),
+                             mainPanel(
+                               plotOutput("plotpositive")
+                             )
+                           )
                  )
+)
 )
 
 

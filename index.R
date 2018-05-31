@@ -103,14 +103,14 @@ data.bins$killer_y = ceiling(data.bins$killer_y/10)
 # Weapon/distance relation
 data.wepdist <- select(data.map2, type, distance)
 # Histogram overlaid with kernel density curve
-ggplot(data.wepdist, aes(x=distance)) + 
+plot.weapon_dist <- ggplot(data.wepdist, aes(x=distance)) + 
   geom_histogram(binwidth=.5,
                  colour="black", fill="white") +
   geom_density(alpha=.2, fill="#FF6666") + 
   geom_vline(aes(xintercept=mean(distance)),   # Ignore NA values for mean
                                                    color="red", linetype="dashed", size=1) +# Overlay with transparent density plot
   facet_wrap( ~ type, ncol = 2)
-  
+plot.weapon_dist  
 
 # Counting death/kill location at each bin.
 data.bins.v <- select(data.bins, x = victim_x, y = victim_y) %>% 
@@ -132,7 +132,7 @@ data.bins.good <- filter(data.bins.diff, kill_pos > 2)
 data.bins.bad <- filter(data.bins.diff, kill_pos < -2)
 
 # plot showing good and bad positions:
-kill.positive <- ggplot() +
+plot.positive <- ggplot() +
   annotation_custom(rasterGrob(img, 
                                        width = unit(1,"npc"), 
                                        height = unit(1,"npc")), 
@@ -142,49 +142,49 @@ kill.positive <- ggplot() +
   ylab("Y coordinate") +
   geom_point(data = data.bins.bad, aes(x = x, y = y, color = "red", size = -kill_pos)) +
   scale_y_continuous(expand = c(0, 0), limits = c(0, 100)) + 
-  scale_x_continuous(expand = c(0, 0), limits = c(0, 100))
+  scale_x_continuous(expand = c(0, 0), limits = c(0, 100))+ coord_fixed(ratio = 1)
 
 
 # Heat map of victim/killer's death position is indicated by a point, and color indicates time of death.
 
-gganimate(ggplot(data.map2) +
-            annotation_custom(rasterGrob(img, 
-                                         width = unit(1,"npc"), 
-                                         height = unit(1,"npc")), 
-                              -Inf, Inf, -Inf, Inf) +
-            geom_point(aes(x = victim_x, y = victim_y, frame = time, color = time, cumulative = TRUE)) +
-            scale_color_gradientn(colours = rainbow(5)) +
-            xlab("X coordinate") +
-            ylab("Y coordinate") +
-            ggtitle("Victim Deaths Over Time || Elapsed time in minutes: ") +
-            scale_y_continuous(expand = c(0, 0), limits = c(0, 1000)) +
-            scale_x_continuous(expand = c(0, 0), limits = c(0, 1000)), "victim_time_heat.gif")
+#gganimate(ggplot(data.map2) +
+#            annotation_custom(rasterGrob(img, 
+#                                         width = unit(1,"npc"), 
+#                                         height = unit(1,"npc")), 
+#                              -Inf, Inf, -Inf, Inf) +
+#            geom_point(aes(x = victim_x, y = victim_y, frame = time, color = time, cumulative = TRUE)) +
+#            scale_color_gradientn(colours = rainbow(5)) +
+#            xlab("X coordinate") +
+#            ylab("Y coordinate") +
+#            ggtitle("Victim Deaths Over Time || Elapsed time in minutes: ") +
+#            scale_y_continuous(expand = c(0, 0), limits = c(0, 1000)) +
+#            scale_x_continuous(expand = c(0, 0), limits = c(0, 1000)), "victim_time_heat.gif")
 
-gganimate(ggplot(data.map2) +
-                               annotation_custom(rasterGrob(img, 
-                                                            width = unit(1,"npc"), 
-                                                            height = unit(1,"npc")), 
-                                                 -Inf, Inf, -Inf, Inf) +
-                               geom_point(aes(x = killer_x, y = killer_y, frame = time, color = time, cumulative = TRUE)) +
-                               scale_color_gradientn(colours = rainbow(5)) +
-            xlab("X coordinate") +
-            ylab("Y coordinate") +
-            ggtitle("Killer Deaths Over Time || Elapsed time in minutes: ") +
-            scale_y_continuous(expand = c(0, 0), limits = c(0, 1000)) +
-            scale_x_continuous(expand = c(0, 0), limits = c(0, 1000)), "killer_time_heat.gif")
+#gganimate(ggplot(data.map2) +
+#                               annotation_custom(rasterGrob(img, 
+#                                                            width = unit(1,"npc"), 
+#                                                            height = unit(1,"npc")), 
+#                                                 -Inf, Inf, -Inf, Inf) +
+#                               geom_point(aes(x = killer_x, y = killer_y, frame = time, color = time, cumulative = TRUE)) +
+#                               scale_color_gradientn(colours = rainbow(5)) +
+#            xlab("X coordinate") +
+#            ylab("Y coordinate") +
+#            ggtitle("Killer Deaths Over Time || Elapsed time in minutes: ") +
+#            scale_y_continuous(expand = c(0, 0), limits = c(0, 1000)) +
+#            scale_x_continuous(expand = c(0, 0), limits = c(0, 1000)), "killer_time_heat.gif")
 
 # Heat map indicating killer vs victim position, looking for anomalies.
 
-gganimate(ggplot(data.map2) +
-                              geom_point(aes(x = killer_x, y = killer_y, frame = time, color = "orange", alpha = 0.01, cumulative = TRUE)) +
-                              geom_point(aes(x = victim_x, y = victim_y, frame = time, color = "blue", alpha = 0.01, cumulative = TRUE)) +
-                              theme_void() +
-                              theme(plot.background = element_rect(fill = "black")) +
-            scale_y_continuous(expand = c(0, 0), limits = c(0, 1000)) +
-            scale_x_continuous(expand = c(0, 0), limits = c(0, 1000)),
-                            "event_diff.gif")
+#gganimate(ggplot(data.map2) +
+#                              geom_point(aes(x = killer_x, y = killer_y, frame = time, color = "orange", alpha = 0.01, cumulative = TRUE)) +
+#                              geom_point(aes(x = victim_x, y = victim_y, frame = time, color = "blue", alpha = 0.01, cumulative = TRUE)) +
+#                              theme_void() +
+#                             theme(plot.background = element_rect(fill = "black")) +
+#            scale_y_continuous(expand = c(0, 0), limits = c(0, 1000)) +
+#            scale_x_continuous(expand = c(0, 0), limits = c(0, 1000)),
+#                            "event_diff.gif")
 
-annotation_custom(rasterGrob(img, 
-                             width = unit(1,"npc"), 
-                             height = unit(1,"npc")), 
-                  -Inf, Inf, -Inf, Inf)
+#annotation_custom(rasterGrob(img, 
+#                             width = unit(1,"npc"), 
+#                             height = unit(1,"npc")), 
+#                  -Inf, Inf, -Inf, Inf)

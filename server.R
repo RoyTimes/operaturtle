@@ -1,5 +1,5 @@
 library(shiny)
-
+source("index.R")
 
 server <- function(input, output) {
   type <- reactive({
@@ -59,5 +59,13 @@ server <- function(input, output) {
                    type="video/mp4", width="480px", height="480px", controls = "controls")		
       )
     }
+  })
+  
+  output$plotpositive <- renderPlot({
+    plot.positive
+  })
+  
+  output$plotweapon <- renderPlot({
+    plot.weapon_dist
   })
 }
