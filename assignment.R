@@ -4,17 +4,16 @@ library(ggplot2)
 library(jpeg)
 library(data.table)
 library(devtools)
-library(gganimate)
+#devtools::install_github("dgrtwo/gganimate")
+library("gganimate")
+#install.packages("magick")
 library(magick)
 library(grid)
+#setwd("~/INFO 201/FINAL/operaturtle")
+data.in <- read.csv("data/f_miramar.csv")
+data.in <- filter(data.in, map_id == "MIRAMAR")
 
-#devtools::install_github("dgrtwo/gganimate")
-#install.packages("magick")
-
-data.in <- read.csv("data/f_miramar.csv") %>% 
-  filter(data.in, map_id == "MIRAMAR")
-
-img <- readJPEG("media/JPEG/miramar.jpg")
+img <- readJPEG("data/miramar.jpg")
 
 ##########################################################################
 ### Filtering Dataset
@@ -66,6 +65,10 @@ data.weapon$type[data.weapon$weapon %in% c('Crossbow','Pan','Machete','Crowbar',
 data.weapon$type[data.weapon$weapon %in% c('PickupTruck','Buggy','HitbyCar','Motorbike','Boat','Motorbike(SideCar)','Dacia','death.BP_PickupTruck_B_01_C','death.BP_Van_A_03_C','Uaz')] <- "Vehicle"
 data.weapon$type[data.weapon$weapon %in% c('death.ProjMolotov_DamageField_C','Grenade','death.Buff_FireDOT_C','death.ProjMolotov_C')] <- "Area Damage"
 data.weapon$type[data.weapon$weapon %in% c('DownandOut','Drown','RedZone','death.RedZoneBomb_C','Bluezone','Falling')] <- "Environmnent"
+
+
+####
+
 
 # Combine everything into one data frame.
 data.map <- data.frame(data.victim.x, data.victim.y, data.killer.x, data.killer.y, data.time, data.weapon)
@@ -128,8 +131,8 @@ data.bins.diff <- mutate(data.bins.diff, kill_pos = count_k - count_v)
 data.bins.diff %>% group_by(kill_pos) %>% summarize(count = n())
 
 # Create table where good and bad points shown.
-data.bins.good <- filter(data.bins.diff, kill_pos > 4)
-data.bins.bad <- filter(data.bins.diff, kill_pos < -4)
+data.bins.good <- filter(data.bins.diff, kill_pos > 2)
+data.bins.bad <- filter(data.bins.diff, kill_pos < -2)
 
 # plot showing good and bad positions:
 ggplot() +
@@ -141,7 +144,8 @@ ggplot() +
   xlab("X coordinate") +
   ylab("Y coordinate") +
   geom_point(data = data.bins.bad, aes(x = x, y = y, color = "red", size = -kill_pos)) +
-  expand_limits(x = 0, y = 0)
+  scale_y_continuous(expand = c(0, 0), limits = c(0, 100)) + 
+  scale_x_continuous(expand = c(0, 0), limits = c(0, 100))
 
 
 
@@ -156,7 +160,9 @@ gganimate(ggplot(data.map2) +
             scale_color_gradientn(colours = rainbow(5)) +
             xlab("X coordinate") +
             ylab("Y coordinate") +
-            ggtitle("Victim Deaths Over Time || Elapsed time in minutes: "), "victim_time_heat.gif")
+            ggtitle("Victim Deaths Over Time || Elapsed time in minutes: ") +
+            scale_y_continuous(expand = c(0, 0), limits = c(0, 1000)) +
+            scale_x_continuous(expand = c(0, 0), limits = c(0, 1000)), "victim_time_heat.gif")
 
 gganimate(ggplot(data.map2) +
                                annotation_custom(rasterGrob(img, 
@@ -167,18 +173,21 @@ gganimate(ggplot(data.map2) +
                                scale_color_gradientn(colours = rainbow(5)) +
             xlab("X coordinate") +
             ylab("Y coordinate") +
-            ggtitle("Killer Deaths Over Time || Elapsed time in minutes: "), "killer_time_heat.gif")
+            ggtitle("Killer Deaths Over Time || Elapsed time in minutes: ") +
+            scale_y_continuous(expand = c(0, 0), limits = c(0, 1000)) +
+            scale_x_continuous(expand = c(0, 0), limits = c(0, 1000)), "killer_time_heat.gif")
 
 # Heat map indicating killer vs victim position, looking for anomalies.
 
 gganimate(ggplot(data.map2) +
-                              geom_point(aes(x = killer_x, y = killer_y, frame = time, color = "blue", alpha = 0.001, cumulative = TRUE)) +
-                              geom_point(aes(x = victim_x, y = victim_y, frame = time, color = "black", alpha = 0.001, cumulative = TRUE)) +
+                              geom_point(aes(x = killer_x, y = killer_y, frame = time, color = "orange", alpha = 0.01, cumulative = TRUE)) +
+                              geom_point(aes(x = victim_x, y = victim_y, frame = time, color = "blue", alpha = 0.01, cumulative = TRUE)) +
                               theme_void() +
-                              theme(plot.background = element_rect(fill = "black")),
+                              theme(plot.background = element_rect(fill = "black")) +
+            scale_y_continuous(expand = c(0, 0), limits = c(0, 1000)) +
+            scale_x_continuous(expand = c(0, 0), limits = c(0, 1000)),
                             "event_diff.gif")
 
-ggplot(data.map2) +
 
 
 
