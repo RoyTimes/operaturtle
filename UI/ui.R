@@ -17,21 +17,21 @@ server <- function(input, output) {
 
 		if (type() == "victims") {
 			mainPanel(
-				tags$video(src="Victim_time_heat.mp4", 
+				tags$video(src="Victim_time_heat.mp4", loop=T, autoplay=T, 
 					type="video/mp4", width="480px", height="480px", controls = "controls")		
 			)
 		}
 		else if (type() == "killers") {
 			mainPanel(
-				tags$video(src="Killer_time_heat.mp4", 
+				tags$video(src="Killer_time_heat.mp4", loop=T, autoplay=T, 
 					type="video/mp4", width="480px", height="480px", controls = "controls")	
 			)
 		}
 		else if (type() == "all") {
 			mainPanel(
-				tags$video(src="Victim_time_heat.mp4", 
+				tags$video(src="Victim_time_heat.mp4", loop=T, autoplay=T, 
 					type="video/mp4", width="480px", height="480px", controls = "controls")	,
-				tags$video(src="Killer_time_heat.mp4", 
+				tags$video(src="Killer_time_heat.mp4", loop=T, autoplay=T, 
 					type="video/mp4", width="480px", height="480px", controls = "controls")		
 			)
 		}
@@ -41,33 +41,33 @@ server <- function(input, output) {
 
 		if (weapon() == "victims") {
 			mainPanel(
-				tags$video(src="Victim_time_heat.mp4", 
+				tags$video(src="Victim_time_heat.mp4", loop=T, autoplay=T, 
 					type="video/mp4", width="480px", height="480px", controls = "controls")		
 			)
 		}
 		else if (weapon() == "killers") {
 			mainPanel(
-				tags$video(src="Killer_time_heat.mp4", 
+				tags$video(src="Killer_time_heat.mp4", loop=T, autoplay=T, 
 					type="video/mp4", width="480px", height="480px", controls = "controls")	
 			)
 		}
 		else if (weapon() == "all") {
 			mainPanel(
-				tags$video(src="Victim_time_heat.mp4", 
+				tags$video(src="Victim_time_heat.mp4", loop=T, autoplay=T, 
 					type="video/mp4", width="480px", height="480px", controls = "controls")	,
-				tags$video(src="Killer_time_heat.mp4", 
+				tags$video(src="Killer_time_heat.mp4", loop=T, autoplay=T, 
 					type="video/mp4", width="480px", height="480px", controls = "controls")		
 			)
 		}
 	})
 }
 
-ui <- fluidPage( theme = shinytheme("flatly"),
+ui <- fluidPage( style="padding: 0px;",  theme = shinytheme("flatly"),
 	navbarPage("Play Unknown's Battleground",
 		tabPanel("Introduction", sidebarLayout (
 				sidebarPanel(
 					h4("Introduction To PUBG"),
-					p(' "PlayerUnkown’s Battlegrounds" (also noted as PUBG), a first and third-person shooter battle royale game. It matches 100 players to be drop onto an island, and those players shall fight until only one person remains. Players are allowed to play as a team of four or two, as well as playing solo. At the beginning of the game, from an airplane, players are airdropped onto the island where they can loot towns and buildings, for weapons, ammo, armor and first-aid. A blue-zone (as shown below) will appear a few minutes later to corral players closer and closer by dealing damage to anyone that stands outside the blue-zone. Additionally, there will be supply drops coming later on in the game, in which there will be legendary items.'),
+					p('"PlayerUnkown’s Battlegrounds" (also noted as PUBG), a first and third-person shooter battle royale game. It matches 100 players to be drop onto an island, and those players shall fight until only one person remains. Players are allowed to play as a team of four or two, as well as playing solo. At the beginning of the game, from an airplane, players are airdropped onto the island where they can loot towns and buildings, for weapons, ammo, armor and first-aid. A blue-zone (as shown below) will appear a few minutes later to corral players closer and closer by dealing damage to anyone that stands outside the blue-zone. Additionally, there will be supply drops coming later on in the game, in which there will be legendary items.'),
 					hr(style="border: 1px grey solid"),
 					h4('Dataset Could be Downloaded From'),
 
@@ -100,10 +100,10 @@ ui <- fluidPage( theme = shinytheme("flatly"),
 						)
 					)
 				), uiOutput("plot1")
-			), 
-			p("Analysis")
+			), br(),
+			p("Analysis", style="margin: 10px")
 		),
-		tabPanel("Weapons", sidebarLayout (
+		tabPanel("Cause of Death", sidebarLayout (
 				sidebarPanel(
 					radioButtons("weapon", "Choose one:",
 						choiceNames = list(
