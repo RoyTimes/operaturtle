@@ -33,7 +33,7 @@ ui <- fluidPage( theme = shinytheme("flatly"),
              ),
              tabPanel("Time of Death", sidebarLayout (
 	               sidebarPanel(
-	               		radioButtons("rb", "Choose one:",
+	               		radioButtons("display", "Choose one:",
 						               choiceNames = list(
 						                 "Killers",
 						                 "Victims",
@@ -43,8 +43,7 @@ ui <- fluidPage( theme = shinytheme("flatly"),
 						                 "killers", "victims", "all"
 						               )
 						),
-						textOutput("choice.kva"),br(),
-	                    hr(style="border: 1px grey solid"),br(),
+	                    br(),hr(style="border: 1px grey solid"),br(),
 						sliderInput("time", "Time:",
 							min = 0, max = 33,
 							value = 5)
@@ -56,7 +55,32 @@ ui <- fluidPage( theme = shinytheme("flatly"),
              ),
              tabPanel("Weapons", sidebarLayout (
                sidebarPanel(
-                 h4("Random Random")
+                 radioButtons("weapon", "Choose one:",
+						               choiceNames = list(
+						                 "Sniper & DMR",
+										"AR & LMG",
+										"SMG",
+										"Shotgun",
+										"Pistol",
+										"Melee / Other",
+										"Vehicle",
+										"Area Damage",
+										"Environment",
+						               ),
+						               choiceValues = list(
+						                "Sniper & DMR",
+											"AR & LMG",
+											"SMG",
+											"Shotgun",
+											"Pistol",
+											"Melee / Other",
+											"Vehicle",
+											"Area Damage",
+											"Environment"
+
+
+						               )
+						),
                ), mainPanel(
                  h3("aaa")
                )
@@ -65,5 +89,4 @@ ui <- fluidPage( theme = shinytheme("flatly"),
 )
 
 shinyApp(ui, server)
-
 
