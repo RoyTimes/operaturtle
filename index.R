@@ -22,10 +22,9 @@ img <- readJPEG("media/JPEG/miramar.jpg")
 ##########################################################################
 
 #Extracting Invidiual Values into Tables
-
 ## Storing Victim Position Data.
 
-# The x coordinates are flipped in the data set thus we flip them around.
+#The x coordinates are flipped in the data set thus we flip them around.
 data.victim.x <- select(data.in, contains("x")) %>% 
   select(contains("victim")) %>% 
   gather(Player, victim_x, deaths_0_victim_position_x:deaths_9_victim_position_x) %>% 
@@ -36,7 +35,7 @@ data.victim.y <- select(data.in, contains("y")) %>%
   gather(Player, victim_y, deaths_0_victim_position_y:deaths_9_victim_position_y) %>% 
   mutate(victim_y = round(victim_y / 800000 * 1000))
 
-# Storing Killer position Data.
+#Storing Killer's Position Data.
 data.killer.x <-  select(data.in, contains("x")) %>% 
   select(contains("killer")) %>% 
   gather(Player, killer_x, deaths_0_killer_position_x:deaths_9_killer_position_x) %>% 
@@ -47,15 +46,16 @@ data.killer.y <- select(data.in, contains("y")) %>%
   gather(Player, killer_y, deaths_0_killer_position_y:deaths_9_killer_position_y) %>% 
   mutate(killer_y = round(killer_y / 800000 * 1000))
 
-# Storing Time Data in seconds
+#Storing Time Data in Seconds
 data.time <- select(data.in, contains("time")) %>% 
   gather(Player, time, deaths_0_time_event:deaths_9_time_event) %>% 
   mutate(time = ceiling(time / 60))
 
-# Storing weapon used.
+#Storing Weapon Used.
 data.weapon <- select(data.in, contains("description")) %>% 
   gather(Player, weapon, deaths_0_description:deaths_9_description)
 
+#Adding Attributes to Each Weapon
 data.weapon$type[data.weapon$weapon %in% c('AWM','M24','Kar98k','Win94','Mk14','SLR','SKS','Mini14','VSS')] <- "Sniper & DMR"
 data.weapon$type[data.weapon$weapon %in% c('Groza','AKM','DP-28','M249','AUG','M16A4','M416','SCAR-L')] <- "AR & LMG"
 data.weapon$type[data.weapon$weapon %in% c('TommyGun','UMP9','Vector','UZI', 'MicroUZI')] <- "SMG"
@@ -67,76 +67,62 @@ data.weapon$type[data.weapon$weapon %in% c('death.ProjMolotov_DamageField_C','Gr
 data.weapon$type[data.weapon$weapon %in% c('DownandOut','Drown','RedZone','death.RedZoneBomb_C','Bluezone','Falling')] <- "Environmnent"
 
 
-# Combine everything into one data frame.
+#Combine Everything into One Data Drame.
 data.map <- data.frame(data.victim.x, data.victim.y, data.killer.x, data.killer.y, data.time, data.weapon)
 
-# Drop rows which contain column names
-data.map <- select(data.map,
-                   time,
-                   victim_x, victim_y,
+#Drop Rows Which Contain Column Names
+data.map <- select(data.map, time,
+        victim_x, victim_y,
                    weapon, type,
                    killer_x, killer_y)
 
 data.map <- mutate(data.map, distance = sqrt(abs((killer_x - victim_x)*(killer_x - victim_x)) +
                                                abs((killer_y - victim_y))*(killer_y - victim_y)))
 
-
-
 ##########################################################################
 ### Graphing Plots and Maps
 ##########################################################################
 
-# data.map2 reduces values by:
-# 1. Removing na values
-# 2. Filtering for coordinates of killer/victim which are at the edge of the map.
+#data.map2 reduces values by:
+##1.Removing NA Values 2.Filtering For Coordinates of Killer/Victim Which Are at The Edge of The Map.
 data.map2 <- na.omit(data.map)
 data.map2 <- filter(data.map2, !(victim_x == 1000 & victim_y == 0)) %>% 
   filter(!(killer_x == 1000 & killer_y == 0))
 
-# binning the data into a smaller grid size. 
+#Binning The Data Into a Smaller Grid Size. 
 data.bins <- data.map2
 data.bins$victim_x = ceiling(data.bins$victim_x/10)
 data.bins$victim_y = ceiling(data.bins$victim_y/10)
 data.bins$killer_x = ceiling(data.bins$killer_x/10)
 data.bins$killer_y = ceiling(data.bins$killer_y/10)
 
-# Weapon/distance relation
+#Weapon/Distance Relation
 data.wepdist <- select(data.map2, type, distance)
-# Histogram overlaid with kernel density curve
-plot.weapon_dist <- ggplot(data.wepdist, aes(x=distance)) + 
-  geom_histogram(binwidth=.5,
-                 colour="black", fill="white") +
-  geom_density(alpha=.2, fill="#FF6666") + 
-  geom_vline(aes(xintercept=mean(distance)),   # Ignore NA values for mean
-                                                   color="red", linetype="dashed", size=1) +# Overlay with transparent density plot
-  facet_wrap( ~ type, ncol = 2)
-plot.weapon_dist  
 
-# Counting death/kill location at each bin.
+#Counting Death/Kill Location at Each Bin.
 data.bins.v <- select(data.bins, x = victim_x, y = victim_y) %>% 
   group_by(x, y) %>% 
   summarize(count_v = n())
+
 data.bins.k <- select(data.bins, x = killer_x, y = killer_y) %>% 
   group_by(x, y) %>% 
   summarize(count_k = n())
+
 data.bins.diff <- merge(data.bins.k, data.bins.v, by = c("x", "y"), all = TRUE)
 data.bins.diff$count_k[is.na(data.bins.diff$count_k)] <- 0
 data.bins.diff$count_v[is.na(data.bins.diff$count_v)] <- 0
 
-# Calculating points of interest/not.
+# Calculating Points of Interest/Not.
 data.bins.diff <- mutate(data.bins.diff, kill_pos = count_k - count_v)
 data.bins.diff %>% group_by(kill_pos) %>% summarize(count = n())
 
-# Create table where good and bad points shown.
+#Create Table Where Good and Bad Points Shown.
 data.bins.good <- filter(data.bins.diff, kill_pos > 2)
 data.bins.bad <- filter(data.bins.diff, kill_pos < -2)
 
-# plot showing good and bad positions:
-plot.positive <- ggplot() +
-  annotation_custom(rasterGrob(img, 
-                                       width = unit(1,"npc"), 
-                                       height = unit(1,"npc")), 
-                            -Inf, Inf, -Inf, Inf) +
+#Plot Showing Good and Bad Positions:
+plot.correlation <- ggplot() +
+  annotation_custom(rasterGrob(img, width = unit(1,"npc"), height = unit(1,"npc")), -Inf, Inf, -Inf, Inf) +
   geom_point(data = data.bins.good, aes(x = x, y = y, color = "blue", size = kill_pos)) +
   xlab("X coordinate") +
   ylab("Y coordinate") +
@@ -144,47 +130,36 @@ plot.positive <- ggplot() +
   scale_y_continuous(expand = c(0, 0), limits = c(0, 100)) + 
   scale_x_continuous(expand = c(0, 0), limits = c(0, 100))+ coord_fixed(ratio = 1)
 
+#Heatmap of Victim/killer's Death/Kill Position is Indicated By a Point, And Color Indicates Time of Death.
+##Commented Out, Don't Execute These Since it Will Take Time to Process
+#plotVictim <- gganimate(ggplot(data.map2) +
+#                          annotation_custom(rasterGrob(img, width = unit(1,"npc"), height = unit(1,"npc")), -Inf, Inf, -Inf, Inf) +
+#                          geom_point(aes(x = victim_x, y = victim_y, frame = time, color = time, cumulative = TRUE)) +
+#                          scale_color_gradientn(colours = rainbow(5)) +
+#                          xlab("X coordinate") +
+#                          ylab("Y coordinate") +
+#                          ggtitle("Victim Deaths Over Time || Elapsed time in minutes: ") +
+#                          scale_y_continuous(expand = c(0, 0), limits = c(0, 1000)) +
+#                          scale_x_continuous(expand = c(0, 0), limits = c(0, 1000)), "victim_time_heat.gif")
 
-# Heat map of victim/killer's death position is indicated by a point, and color indicates time of death.
+#plotKiller <- gganimate(ggplot(data.map2) +
+#                          annotation_custom(rasterGrob(img, width = unit(1,"npc"), height = unit(1,"npc")), -Inf, Inf, -Inf, Inf) +
+#                          geom_point(aes(x = killer_x, y = killer_y, frame = time, color = time, cumulative = TRUE)) +
+#                          scale_color_gradientn(colours = rainbow(5)) +
+#                          xlab("X coordinate") +
+#                          ylab("Y coordinate") +
+#                          ggtitle("Killer Deaths Over Time || Elapsed time in minutes: ") +
+#                          scale_y_continuous(expand = c(0, 0), limits = c(0, 1000)) +
+#                          scale_x_continuous(expand = c(0, 0), limits = c(0, 1000)), "killer_time_heat.gif")
 
-#gganimate(ggplot(data.map2) +
-#            annotation_custom(rasterGrob(img, 
-#                                         width = unit(1,"npc"), 
-#                                         height = unit(1,"npc")), 
-#                              -Inf, Inf, -Inf, Inf) +
-#            geom_point(aes(x = victim_x, y = victim_y, frame = time, color = time, cumulative = TRUE)) +
-#            scale_color_gradientn(colours = rainbow(5)) +
-#            xlab("X coordinate") +
-#            ylab("Y coordinate") +
-#            ggtitle("Victim Deaths Over Time || Elapsed time in minutes: ") +
-#            scale_y_continuous(expand = c(0, 0), limits = c(0, 1000)) +
-#            scale_x_continuous(expand = c(0, 0), limits = c(0, 1000)), "victim_time_heat.gif")
+#Heatmap Indicating Killer vs Victim Position, Looking For Anomalies.
+#plotBoth <- gganimate(ggplot(data.map2) +
+#                        geom_point(aes(x = killer_x, y = killer_y, frame = time, color = "orange", alpha = 0.01, cumulative = TRUE)) +
+#                        geom_point(aes(x = victim_x, y = victim_y, frame = time, color = "blue", alpha = 0.01, cumulative = TRUE)) +
+#                        theme_void() +
+#                        theme(plot.background = element_rect(fill = "black")) +
+#                        scale_y_continuous(expand = c(0, 0), limits = c(0, 1000)) +
+#                        scale_x_continuous(expand = c(0, 0), limits = c(0, 1000)), "event_diff.gif")
 
-#gganimate(ggplot(data.map2) +
-#                               annotation_custom(rasterGrob(img, 
-#                                                            width = unit(1,"npc"), 
-#                                                            height = unit(1,"npc")), 
-#                                                 -Inf, Inf, -Inf, Inf) +
-#                               geom_point(aes(x = killer_x, y = killer_y, frame = time, color = time, cumulative = TRUE)) +
-#                               scale_color_gradientn(colours = rainbow(5)) +
-#            xlab("X coordinate") +
-#            ylab("Y coordinate") +
-#            ggtitle("Killer Deaths Over Time || Elapsed time in minutes: ") +
-#            scale_y_continuous(expand = c(0, 0), limits = c(0, 1000)) +
-#            scale_x_continuous(expand = c(0, 0), limits = c(0, 1000)), "killer_time_heat.gif")
-
-# Heat map indicating killer vs victim position, looking for anomalies.
-
-#gganimate(ggplot(data.map2) +
-#                              geom_point(aes(x = killer_x, y = killer_y, frame = time, color = "orange", alpha = 0.01, cumulative = TRUE)) +
-#                              geom_point(aes(x = victim_x, y = victim_y, frame = time, color = "blue", alpha = 0.01, cumulative = TRUE)) +
-#                              theme_void() +
-#                             theme(plot.background = element_rect(fill = "black")) +
-#            scale_y_continuous(expand = c(0, 0), limits = c(0, 1000)) +
-#            scale_x_continuous(expand = c(0, 0), limits = c(0, 1000)),
-#                            "event_diff.gif")
-
-#annotation_custom(rasterGrob(img, 
-#                             width = unit(1,"npc"), 
-#                             height = unit(1,"npc")), 
-#                  -Inf, Inf, -Inf, Inf)
+#Renders Image on GIF
+#plotImage <- annotation_custom(rasterGrob(img, width = unit(1,"npc"), height = unit(1,"npc")), -Inf, Inf, -Inf, Inf)
