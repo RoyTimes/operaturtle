@@ -29,34 +29,8 @@ server <- function(input, output) {
     }
     else if (type() == "all") {
       mainPanel(
-        tags$video(src="victim_heatmap.mp4", loop=T, autoplay=T, 
-                   type="video/mp4", width="480px", height="480px", controls = "controls")	,
-        tags$video(src="killer_heatmap.mp4", loop=T, autoplay=T, 
-                   type="video/mp4", width="480px", height="480px", controls = "controls")		
-      )
-    }
-  })
-  
-  output$plot2 <- renderUI({
-    
-    if (weapon() == "victims") {
-      mainPanel(
-        tags$video(src="victim_heatmap.mp4", loop=T, autoplay=T, 
-                   type="video/mp4", width="480px", height="480px", controls = "controls")		
-      )
-    }
-    else if (weapon() == "killers") {
-      mainPanel(
-        tags$video(src="killer_heatmap.mp4", loop=T, autoplay=T, 
+        tags$video(src="event_diff.mp4", loop=T, autoplay=T, 
                    type="video/mp4", width="480px", height="480px", controls = "controls")	
-      )
-    }
-    else if (weapon() == "all") {
-      mainPanel(
-        tags$video(src="victim_heatmap.mp4", loop=T, autoplay=T, 
-                   type="video/mp4", width="480px", height="480px", controls = "controls")	,
-        tags$video(src="killer_heatmap.mp4", loop=T, autoplay=T, 
-                   type="video/mp4", width="480px", height="480px", controls = "controls")		
       )
     }
   })
