@@ -23,7 +23,7 @@ my_ui <- fluidPage(style="padding: 0px;",  theme = shinytheme("flatly"),
                                            hr(style="border-color: #EEEEEE -moz-use-text-color #FFFFFF; border-style: solid none; border-width: 1px 0; margin: 18px 0;"),
             
                                            h4('Dataset Source:'),
-                                           a("Download Link - Kaggle", href=""),
+                                           a("Dataset Link (Kaggle)", href="https://www.kaggle.com/skihikingkevin/pubg-match-deaths"),
                                    
                                            hr(style="border-color: #EEEEEE -moz-use-text-color #FFFFFF; border-style: solid none; border-width: 1px 0; margin: 18px 0;")
                                  
